@@ -37,6 +37,18 @@ def main():
         st.subheader("Extracted Text Snippet")
         st.text(text[:300] + "..." if len(text) > 300 else text)
         
+        # Step 3: Simple Document Type Classification
+        doc_type = "Other"
+        text_lower = text.lower()
+        
+        if any(word in text_lower for word in ["invoice", "total", "invoice number"]):
+            doc_type = "Invoice"
+        elif any(word in text_lower for word in ["resume", "skills", "education", "experience"]):
+            doc_type = "Resume"
+            
+        st.subheader("Document Type")
+        st.info(f"We identified this document as: **{doc_type}**")
+        
         # We will add next steps here!
 
 if __name__ == "__main__":
