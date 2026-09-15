@@ -49,7 +49,47 @@ def main():
         st.subheader("Document Type")
         st.info(f"We identified this document as: **{doc_type}**")
         
-        # We will add next steps here!
+        # Step 4: Extract Simple Information
+        st.subheader("Extracted Details")
+        details = {}
+        
+        if doc_type == "Invoice":
+            # Very simple regular expressions for MVP
+            inv_num = re.search(r'Invoice Number[:\s]*(INV-\d+|\d+)', text, re.IGNORECASE)
+            date = re.search(r'Date[:\s]*(\d{2}-\d{2}-\d{4}|\d{4}-\d{2}-\d{2})', text, re.IGNORECASE)
+            total = re.search(r'Total[:\s]*([A-Z]*\s*\d+[,\.]?\d*)', text, re.IGNORECASE)
+            
+            # Simple assumption: Company name is the first line
+            lines = [line.strip() for line in text.split('\n') if line.strip()]
+            company_name = lines[0] if lines else "Not Found"
+            
+            details["Invoice Number"] = inv_num.group(1) if inv_num else "Not Found"
+            details["Date"] = date.group(1) if date else "Not Found"
+            details["Company"] = company_name
+            details["Total Amount"] = total.group(1) if total else "Not Found"
+            
+        elif doc_type == "Resume":
+            email = re.search(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', text)
+            phone = re.search(r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}', text)
+            
+            # Simple assumption: Name is the first line
+            lines = [line.strip() for line in text.split('\n') if line.strip()]
+            name = lines[0] if lines else "Not Found"
+            
+            details["Name"] = name
+            details["Email"] = email.group(0) if email else "Not Found"
+            details["Phone"] = phone.group(0) if phone else "Not Found"
+            details["Skills"] = "Python, Streamlit, Machine Learning" # Mocking this for simplicity, can get complex!
+            
+        else:
+            st.write("We do not support extracting details from this type yet.")
+            
+        # Step 5: Show the Result
+        if details:
+            for key, value in details.items():
+                st.write(f"**{key}:** {value}")
+        
+        # We are done!
 
 if __name__ == "__main__":
     main()
